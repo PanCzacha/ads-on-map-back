@@ -27,7 +27,6 @@ export class AdRecord implements AdEntity {
             throw new ValidationError("Cena nie może być mniejsza niż 0 lub większa niż 9 999 999");
         }
 
-        //@TODO check if url is valid
 
         if(!obj.url || obj.url.length > 100) {
             throw new ValidationError("Link nie może być pusty, ani przekraczać 100 znaków");
