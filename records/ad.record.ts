@@ -1,9 +1,13 @@
 import {AdEntity} from "../types";
 import {ValidationError} from "../utils/error";
+import {pool} from "../utils/db";
+import {FieldPacket, RowDataPacket} from "mysql2";
 
 interface NewAdEntity extends Omit<AdEntity, "id"> {
     id?: string;
 }
+
+type AdRecordResults = [AdEntity[], FieldPacket[]];
 
 export class AdRecord implements AdEntity {
     public id: string;
@@ -47,5 +51,12 @@ export class AdRecord implements AdEntity {
 
     }
 
+    static async findOne(id: string): Promise<AdRecord | null> {
+        const [results] = await pool.execute("SELECT * FROM `ads` WHERE id = :id", {
+            id,
+        }) as AdRecordResults;
+
+        return results.length === 0 ? null : new AdRecord(results[0])
+    }
 
 }
