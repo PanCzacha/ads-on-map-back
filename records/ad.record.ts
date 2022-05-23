@@ -1,7 +1,7 @@
 import {AdEntity} from "../types";
 import {ValidationError} from "../utils/error";
-import {pool} from "../utils/db";
-import {FieldPacket, RowDataPacket} from "mysql2";
+import {pool, uuid} from "../utils/db";
+import {FieldPacket} from "mysql2";
 
 interface NewAdEntity extends Omit<AdEntity, "id"> {
     id?: string;
@@ -15,8 +15,9 @@ export class AdRecord implements AdEntity {
     public description: string;
     public price: number;
     public url: string;
-    public lat: number;
     public lon: number;
+    public lat: number;
+
 
     constructor(obj: NewAdEntity) {
         if(!obj.name || obj.name.length < 1 || obj.name.length > 100) {
@@ -43,13 +44,31 @@ export class AdRecord implements AdEntity {
         // this.id = obj.id;
         // this.name = obj.name;
         // this.description = obj.description;
-        // this.url = obj.url;
-        // this.lat = obj.lat;
-        // this.lon = obj.lon;
         // this.price = obj.price;
+        // this.url = obj.url;
+        // this.lon = obj.lon;
+        // this.lat = obj.lat;
         Object.assign(this, obj);
 
     }
+
+    async insertAd(): Promise<string> {
+        if(!this.id) {
+            this.id = uuid();
+        }
+        await pool.execute("INSERT INTO `ads` VALUES(:id, :name, :description, :price, :url, :lon, :lat)", {
+            id: this.id,
+            name: this.name,
+            description: this.description,
+            price: this.price,
+            url: this.url,
+            lon: this.lon,
+            lat: this.lat,
+
+        })
+
+        return this.id;
+    };
 
     static async findOne(id: string): Promise<AdRecord | null> {
         const [results] = await pool.execute("SELECT * FROM `ads` WHERE id = :id", {
@@ -57,6 +76,17 @@ export class AdRecord implements AdEntity {
         }) as AdRecordResults;
 
         return results.length === 0 ? null : new AdRecord(results[0])
-    }
+    };
+
+    static async findAll(): Promise<AdRecord[]> {
+        const [results] = await pool.execute("SELECT * FROM `ads` ORDER BY `name` ASC") as AdRecordResults;
+        return results.map(obj => new AdRecord(obj));
+    };
+
+    static async search(query: string): Promise<AdRecord[] | null> {
+        const [results] = await pool.execute("SELECT * FROM `ads` ORDER BY `name` ASC") as AdRecordResults;
+        const found = results.filter((oneResult) => oneResult.name.toLowerCase().includes(query.toLowerCase()));
+        return found.length === 0 ? null : found as AdRecord[]
+    };
 
 }

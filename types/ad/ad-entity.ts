@@ -4,7 +4,7 @@ export interface AdEntity {
     description: string;
     price: number;
     url: string;
-    lat: number;
     lon: number;
+    lat: number;
 }
 
