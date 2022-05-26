@@ -1,11 +1,7 @@
-import {AdEntity} from "../types";
+import {AdEntity, NewAdEntity, SimpleAdEntity} from "../types";
 import {ValidationError} from "../utils/error";
 import {pool, uuid} from "../utils/db";
 import {FieldPacket} from "mysql2";
-
-interface NewAdEntity extends Omit<AdEntity, "id"> {
-    id?: string;
-}
 
 type AdRecordResults = [AdEntity[], FieldPacket[]];
 
@@ -78,15 +74,20 @@ export class AdRecord implements AdEntity {
         return results.length === 0 ? null : new AdRecord(results[0])
     };
 
-    static async findAll(): Promise<AdRecord[]> {
-        const [results] = await pool.execute("SELECT * FROM `ads` ORDER BY `name` ASC") as AdRecordResults;
-        return results.map(obj => new AdRecord(obj));
+    static async findAll(name: string): Promise<SimpleAdEntity[]> {
+        const [results] = await pool.execute("SELECT * FROM `ads` WHERE `name` LIKE :search", {
+            search: `%${name}%`, // szukanie w SQL - trzeba dać procenty przed i po
+        }) as AdRecordResults;
+        return results.map((result) => {
+            const {id, lat, lon,} = result;
+            return {id, lat,lon,}
+        });
     };
 
-    static async search(query: string): Promise<AdRecord[] | null> {
-        const [results] = await pool.execute("SELECT * FROM `ads` ORDER BY `name` ASC") as AdRecordResults;
-        const found = results.filter((oneResult) => oneResult.name.toLowerCase().includes(query.toLowerCase()));
-        return found.length === 0 ? null : found as AdRecord[]
-    };
+    // static async search(query: string): Promise<AdRecord[] | null> {
+    //     const [results] = await pool.execute("SELECT * FROM `ads` ORDER BY `name` ASC") as AdRecordResults;
+    //     const found = results.filter((oneResult) => oneResult.name.toLowerCase().includes(query.toLowerCase()));
+    //     return found.length === 0 ? null : found as AdRecord[]
+    // };
 
 }

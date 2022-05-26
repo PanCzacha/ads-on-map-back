@@ -1,39 +1,46 @@
 import {AdRecord} from "../records/ad.record";
 import {pool} from "../utils/db";
 
-test("AdRecord returns data from database for one entry", async () => {
-    const ad = await AdRecord.findOne("abc45334bvddf");
+afterAll(async () =>  {
+    pool.end();
+})
+
+test("AdRecord.findOne returns data from database for one entry", async () => {
+    const ad = await AdRecord.findOne("117608e2-65cf-483d-ae0d-a6b731932041");
 
     expect(ad).toBeDefined();
-    expect(ad.id).toBe("abc45334bvddf");
-    expect(ad.name).toBe("test");
+    expect(ad.id).toBe("117608e2-65cf-483d-ae0d-a6b731932041");
+    expect(ad.name).toBe("Mariańskie Porzecze");
 });
 
-test("AdRecord returns null from database for unexisting entry.", async () => {
+test("AdRecord.findOne returns null from database for unexisting entry.", async () => {
     const ad = await AdRecord.findOne("gsgdgddgdg");
     expect(ad).toBeNull();
 });
 
-test("AdRecord returns data from database for one entry", async () => {
-    const ad = await AdRecord.findAll();
 
-    expect(ad).toBeDefined();
-});
-
-test("AdRecord returns all ads table entries", async () => {
-    const ad = await AdRecord.findAll();
-    expect(ad).toBeDefined();
+test("AdRecord.findAll returns all ads table entries", async () => {
+    const ads = await AdRecord.findAll("");
+    expect(ads).not.toEqual([]);
+    expect(ads[0].id).toBeDefined();
 })
 
-test("AdRecord searches for specified query and returns array of results", async () => {
-    const ad = await AdRecord.search("Mariańskie Porzecze");
-    console.log(ad);
-    expect(ad).toBeDefined();
+test("AdRecord.findAll searches for specified query and return empty array if not found", async () => {
+    const ad = await AdRecord.findAll("fffsfsfwweewwe");
+    expect(ad).toEqual([]);
 });
 
-test("AdRecord searches for specified query and return null if not found", async () => {
-    const ad = await AdRecord.search("fffsfsfwweewwe");
-    expect(ad).toBeNull();
+test("AdRecord.findAll searches for specified query and returns array of results", async () => {
+    const ad = await AdRecord.findAll("Mariańskie Porzecze");
+    expect(ad).not.toEqual([]);
+    expect(ad[0].id).toBeDefined();
+});
+
+test("AdRecord.findAll returns only id, lat and lon properties", async () => {
+    const ad = await AdRecord.findAll("Mariańskie Porzecze");
+    expect(ad[0].id).toBeDefined();
+    expect(ad[0].lat).toBeDefined();
+    expect(ad[0].lon).toBeDefined();
 });
 
 test("New record is inserted to ads table and uuid is returned", async () => {
