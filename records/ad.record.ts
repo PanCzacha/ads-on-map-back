@@ -48,9 +48,11 @@ export class AdRecord implements AdEntity {
 
     }
 
-    async insertAd(): Promise<string> {
+    async insertAd(): Promise<void> {
         if(!this.id) {
             this.id = uuid();
+        } else {
+            throw new Error("Cannot insert something that is not inserted!");
         }
         await pool.execute("INSERT INTO `ads` VALUES(:id, :name, :description, :price, :url, :lon, :lat)", {
             id: this.id,
@@ -62,8 +64,6 @@ export class AdRecord implements AdEntity {
             lat: this.lat,
 
         })
-
-        return this.id;
     };
 
     static async findOne(id: string): Promise<AdRecord | null> {
