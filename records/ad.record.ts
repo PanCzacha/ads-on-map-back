@@ -76,12 +76,12 @@ export class AdRecord implements AdEntity {
 
     static async findAll(name: string): Promise<SimpleAdEntity[]> {
         const [results] = await pool.execute("SELECT * FROM `ads` WHERE `name` LIKE :search", {
-            search: `%${name}%`, // szukanie w SQL - trzeba dać procenty przed i po
+            search: `%${name}%`, // szukanie w SQL - trzeba dać procenty przed i po, pusty string zwraca wszystkie rekordy :D
         }) as AdRecordResults;
         return results.map((result) => {
             const {id, lat, lon,} = result;
             return {id, lat,lon,}
-        });
+        });1
     };
 
     // static async search(query: string): Promise<AdRecord[] | null> {

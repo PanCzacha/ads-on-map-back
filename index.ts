@@ -1,10 +1,8 @@
-import express, {json, NextFunction, Request, Response} from "express";
+import express, {json} from "express";
 import cors from "cors";
 import rateLimit from "express-rate-limit"
 import {handleError} from "./utils/error";
 import "express-async-errors";
-import {AdRecord} from "./records/ad.record";
-import {MarkupsList, SimpleAdEntity} from "./types";
 import {adRouter} from "./routers/ad.router";
 
 const app = express();
