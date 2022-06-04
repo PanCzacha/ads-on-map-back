@@ -2,5 +2,5 @@
 //     dbHost: "localhost",
 //     dbUser: "user",
 //     dbPassword: "password",
-//     database: "database",
+//     dbDatabase: "database",
 // };
