@@ -11,8 +11,8 @@ export class AdRecord implements AdEntity {
     public description: string;
     public price: number;
     public url: string;
-    public lon: number;
     public lat: number;
+    public lon: number;
 
 
     constructor(obj: NewAdEntity) {
@@ -54,15 +54,14 @@ export class AdRecord implements AdEntity {
         } else {
             throw new Error("Cannot insert something that is not inserted!");
         }
-        await pool.execute("INSERT INTO `ads` VALUES(:id, :name, :description, :price, :url, :lon, :lat)", {
+        await pool.execute("INSERT INTO `ads` VALUES(:id, :name, :description, :price, :url, :lat, :lon)", {
             id: this.id,
             name: this.name,
             description: this.description,
             price: this.price,
             url: this.url,
-            lon: this.lon,
             lat: this.lat,
-
+            lon: this.lon,
         })
     };
 
@@ -80,7 +79,7 @@ export class AdRecord implements AdEntity {
         }) as AdRecordResults;
         return results.map((result) => {
             const {id, lat, lon,} = result;
-            return {id, lat,lon,}
+            return {id, lat, lon,}
         });1
     };
 
