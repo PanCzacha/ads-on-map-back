@@ -1,4 +1,4 @@
-import express, {json} from "express";
+import express, {json, Router} from "express";
 import cors from "cors";
 import rateLimit from "express-rate-limit"
 import {handleError} from "./utils/error";
@@ -17,10 +17,13 @@ app.use(rateLimit({
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 }));
+
+const router = Router();
+
+router.use("/ad", adRouter);
+app.use("/api", router);
+
 app.use(handleError);
-
-app.use("/ad", adRouter);
-
 app.listen(3001, "0.0.0.0", () => {
     console.log("Listening on port http://localhost:3001")
 })
